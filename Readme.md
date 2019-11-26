@@ -9,7 +9,7 @@ A simple commandline interface to interact with the inloox api.
 inlooxcmd.exe import-csv -f C:\path\to\csvfile.csv
 ```
 
-the file looks like:
+example csv file
 
 ```
 Name;StartDateTime;EndeDateTime

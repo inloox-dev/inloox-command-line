@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "InLooxCmd": {
+      "commandName": "Project",
+      "commandLineArgs": "list project"
+    }
+  }
+}

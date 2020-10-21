@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace InLooxShared.Reflection
@@ -15,6 +16,12 @@ namespace InLooxShared.Reflection
         {
             var prop = t.GetProperty(name);
             return prop;
+        }
+
+        public static PropertyInfo[] GetPublicProperties(Type t)
+        {
+            var props = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            return props;
         }
     }
 }

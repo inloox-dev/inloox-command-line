@@ -25,21 +25,21 @@ namespace InLooxCmd.CmdCommands
             HasRequiredOption("f|file=", "The full path of the csv file to import",
                 p => FileLocation = p);
 
-            HasOption("k|keep-open", "keeps console open",
+            HasOption("k|keep-open:", "keeps console open",
                 t => KeepConsoleOpen = t == null || Convert.ToBoolean(t));
 
-            HasOption("e|entity=", "entity to list: Project, Task or TimeTracking",
-                t => Entity = Enum.Parse<Entity>(t ?? nameof(Entity.Task)));
+            HasOption("e|entity:", "entity to list: Project, Task or TimeTracking",
+                t => Entity = EnumParser.ParseFuzzy<Entity>(t ?? nameof(Entity.Task)));
         }
 
         public override int Run(string[] remainingArguments)
         {
+            var defaultColor = Console.ForegroundColor;
+
             try
             {
                 if (remainingArguments.Length > 0)
                     Entity = EnumParser.ParseFuzzy<Entity>(remainingArguments[0]);
-
-                var defaultColor = Console.ForegroundColor;
 
                 var client = StaticDI.GetDefaultClient();
                 if (!client.Logon())
@@ -49,17 +49,7 @@ namespace InLooxCmd.CmdCommands
                 }
 
                 var sync = new CsvSync(client, Entity);
-                try
-                {
-                    sync.Run(FileLocation).Wait();
-                }
-                catch (Exception ex)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Error:");
-                    TraverseExceptions(ex);
-                    Console.ForegroundColor = defaultColor;
-                }
+                sync.Run(FileLocation).Wait();
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("done.");
@@ -72,18 +62,9 @@ namespace InLooxCmd.CmdCommands
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
-
+                Exceptions.PrintException(ex);
                 return FailureState;
             }
-        }
-
-        private void TraverseExceptions(Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            if (ex.InnerException != null)
-                TraverseExceptions(ex.InnerException);
         }
     }
 }

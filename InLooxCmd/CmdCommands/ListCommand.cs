@@ -15,35 +15,32 @@ using System.Threading.Tasks;
 
 namespace InLooxCmd.CmdCommands
 {
-    public class ReadCommand : ConsoleCommand
+    public class ListCommand : ConsoleCommand
     {
         Entity Entity { get; set; }
         string[] Columns { get; set; }
 
-        public ReadCommand()
+        public ListCommand()
         {
-            IsCommand("list", "");
+            IsCommand("list", "print lists. eg. project list, task lists, ...");
 
             HasLongDescription("");
 
-            HasOption("c|columns=", "columns separated by comma",
+            HasOption("c|columns:", "columns separated by comma",
                 t => Columns = t?.Split(','));
 
-            HasOption("e|entity=", "entity to list: Project, Task or TimeTracking",
-                t => Entity = Enum.Parse<Entity>(t ?? nameof(Entity.Project)));
+            HasOption("e|entity:", "entity to list: Project, Task or TimeTracking",
+                t => Entity = EnumParser.ParseFuzzy<Entity>(t ?? nameof(Entity.Project)));
         }
 
         public override int Run(string[] remainingArguments)
         {
+            var defaultcolor = Console.ForegroundColor;
             try
             {
-                if (remainingArguments.Length > 0)
-                    Entity = EnumParser.ParseFuzzy<Entity>(remainingArguments[0]);
-
                 if (Columns == null)
                     Columns = GetDefaultColumns(Entity);
 
-                var defaultcolor = Console.ForegroundColor;
                 var client = StaticDI.GetDefaultClient();
 
                 if (!client.Logon())
@@ -63,9 +60,7 @@ namespace InLooxCmd.CmdCommands
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
-
+                Exceptions.PrintException(ex);
                 return ProcessResult.Error;
             }
         }

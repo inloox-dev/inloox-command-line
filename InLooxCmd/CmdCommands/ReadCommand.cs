@@ -29,9 +29,8 @@ namespace InLooxCmd.CmdCommands
             HasOption("c|columns=", "columns separated by comma",
                 t => Columns = t?.Split(','));
 
-            AllowsAnyAdditionalArguments("entity type: project, task, ... defaults to project");
-
-            Entity = Entity.Project;
+            HasOption("e|entity=", "entity to list: Project, Task or TimeTracking",
+                t => Entity = Enum.Parse<Entity>(t ?? nameof(Entity.Project)));
         }
 
         public override int Run(string[] remainingArguments)

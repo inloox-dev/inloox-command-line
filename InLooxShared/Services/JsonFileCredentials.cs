@@ -1,35 +1,25 @@
-﻿using System;
-using InLooxShared.Interfaces;
+﻿using InLooxShared.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 
 namespace InLooxShared.Services
 {
-    public class JsonFileCredentials : IInLooxCredentials
+    public class JsonFileCredentials : ISettings
     {
-        private const string FileName = "credentials.json";
-        private string _password = "";
-        private string _username = "";
+        private const string FileName = "settings.json";
 
         public void LoadFromFile()
         {
             var content = File.ReadAllText(FileName);
             if (!(JsonConvert.DeserializeObject(content) is JObject obj))
-                throw new NullReferenceException($"Cant deserialize object, {nameof(obj)} is null");
+                throw new JsonSerializationException($"Cant deserialize object, {nameof(obj)} is null");
 
-            _username = (string)obj["username"];
-            _password = (string)obj["password"];
+            AccessToken = (string)obj["access_token"];
+            EndPoint = (string)obj["endpoint"];
         }
 
-        public string GetPassword()
-        {
-            return _password;
-        }
-
-        public string GetUsername()
-        {
-            return _username;
-        }
+        public string AccessToken { get; private set;}
+        public string EndPoint { get; private set; }
     }
 }

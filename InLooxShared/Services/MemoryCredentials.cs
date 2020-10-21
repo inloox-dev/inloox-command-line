@@ -2,19 +2,10 @@
 
 namespace InLooxShared.Services
 {
-    public class MemoryCredentials : IInLooxCredentials
+    public class MemoryCredentials : ISettings
     {
-        public string Password;
-        public string Username;
+        public string AccessToken { get; set; }
 
-        public string GetPassword()
-        {
-            return Password;
-        }
-
-        public string GetUsername()
-        {
-            return Username;
-        }
+        public string EndPoint { get; set; }
     }
 }

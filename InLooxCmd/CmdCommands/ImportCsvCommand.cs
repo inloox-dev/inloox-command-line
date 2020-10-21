@@ -13,7 +13,6 @@ namespace InLooxCmd.CmdCommands
         private const int FailureState = 2;
 
         public string FileLocation { get; set; }
-        public bool StripCommaCharacter { get; set; }
         public bool KeepConsoleOpen { get; set; }
         public Entity Entity { get; set; }
 
@@ -26,13 +25,11 @@ namespace InLooxCmd.CmdCommands
             HasRequiredOption("f|file=", "The full path of the csv file to import",
                 p => FileLocation = p);
 
-            HasOption("s|strip", "Strips ',' from the file before writing to output.",
-                t => StripCommaCharacter = t == null || Convert.ToBoolean(t));
-
             HasOption("k|keep-open", "keeps console open",
                 t => KeepConsoleOpen = t == null || Convert.ToBoolean(t));
 
-            Entity = Entity.Task;
+            HasOption("e|entity=", "entity to list: Project, Task or TimeTracking",
+                t => Entity = Enum.Parse<Entity>(t ?? nameof(Entity.Task)));
         }
 
         public override int Run(string[] remainingArguments)
@@ -52,7 +49,17 @@ namespace InLooxCmd.CmdCommands
                 }
 
                 var sync = new CsvSync(client, Entity);
-                sync.Run(FileLocation).Wait();
+                try
+                {
+                    sync.Run(FileLocation).Wait();
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Error:");
+                    TraverseExceptions(ex);
+                    Console.ForegroundColor = defaultColor;
+                }
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("done.");
@@ -70,6 +77,13 @@ namespace InLooxCmd.CmdCommands
 
                 return FailureState;
             }
+        }
+
+        private void TraverseExceptions(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            if (ex.InnerException != null)
+                TraverseExceptions(ex.InnerException);
         }
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace InLooxShared.Sync
@@ -38,7 +39,8 @@ namespace InLooxShared.Sync
                     await _client.Tasks.AddOrUpdateByName(dict);
                     break;
                 case Entity.Project:
-                    throw new NotImplementedException();
+                    await _client.Projects.AddOrUpdateByName(dict);
+                    break;
                 case Entity.TimeTracking:
                     throw new NotImplementedException();
                 default:
@@ -49,7 +51,7 @@ namespace InLooxShared.Sync
         private static IEnumerable<IDictionary<string, object>> GetRows(string filePath)
         {
             using (var reader = new StreamReader(filePath))
-            using (var csv = new CsvReader(reader))
+            using (var csv = new CsvReader(reader, Thread.CurrentThread.CurrentCulture))
             {
                 var records = csv.GetRecords<dynamic>()
                     .Cast<IDictionary<string, object>>()

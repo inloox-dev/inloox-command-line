@@ -18,7 +18,7 @@ namespace InLooxShared.Test.Odata
         TestSetup GetClient()
         {
             var logger = new MockLogger();
-            var mockCredentials = new MockCredentials();
+            var mockCredentials = new TestSettings();
             var client = new OdClient(logger, mockCredentials);
 
             return new TestSetup
@@ -35,7 +35,7 @@ namespace InLooxShared.Test.Odata
             var res = setup.Client.Logon();
 
             Assert.IsTrue(res);
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(setup.Client.Token));
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(setup.Client.AccessToken));
             Assert.AreEqual(0, setup.Logger.Exceptions.Count);
         }
 

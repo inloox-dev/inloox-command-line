@@ -1,8 +1,8 @@
 ﻿namespace InLooxShared.Interfaces
 {
-    public interface IInLooxCredentials
+    public interface ISettings
     {
-        string GetUsername();
-        string GetPassword();
+        string AccessToken { get; }
+        string EndPoint { get; }
     }
 }
